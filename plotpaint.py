@@ -31,6 +31,8 @@ class Plotpaint:
     def __init__ (self):
         self.strokes = []
         self.feed = 5000
+        self.zUp = 20
+        self.zDown = 5
         
     def dab(self, x, y, angle=0, distance=0, ease=None):
         self.strokes.append([self.Dab(x, y, angle, distance), ease])        
@@ -84,13 +86,11 @@ class Plotpaint:
         
         output = ""
         
-        print(points)
-        
-        output += f"G00 X{points[0][0]:.2f} Y{points[0][1]:.2f} Z10\n"
+        output += f"G00 X{points[0][0]:.2f} Y{points[0][1]:.2f} Z{self.zUp}\n"
         # output += "G01 Z0\n"
         for point in points:
             output += f"G01 X{point[0]:.2f} Y{point[1]:.2f} Z{point[2]:.2f} F{self.feed}\n"
-        output += "G00 Z10\n"
+        output += f"G00 Z{self.zUp}\n"
         
         return output
 

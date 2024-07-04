@@ -1,7 +1,9 @@
 import numpy as np
+from scipy.spatial import distance
 from shapely import LineString
 from shapely.affinity import scale
 import math
+from easing import *
 
 
 def distance_between_points(P1, P2):
@@ -20,37 +22,72 @@ def distance_between_points(P1, P2):
     distance = np.linalg.norm(P1 - P2)
     return distance
 
-def extend_line(line, distance, forceMode="detect"):
+def process_line(line, zHeight=0, runin=20, runout=20):
     
-    if forceMode == "detect":
-        if (LineString(line).is_closed):
-            mode = "poly"
-        else:
-            mode = "line"
-    else:
-        mode = forceMode
+    zRaised = 20
     
-    extend = crop_path(line, distance)
+    xfact = 1
+    yfact = -1
+    
+    if LineString(line).is_closed:
+        xfact = -1
+        yfact = 1
+        print("possible polygon")
+    
+    newLine = line
+    
+    # yfact = 1 to work with polygons - in some way
+    
+    inLine = []
+    if runin:
+        inLine = crop_path(line, runin)
+        inLine = scale(LineString(inLine), yfact = yfact, xfact = xfact, origin = inLine[0])
+        inLine = list(inLine.coords)
+        inLine.reverse()
+        newLine = inLine[:-1] + newLine
+
+    outLine = []
+    if runout:
+        outLine = crop_path(line, -runout)
+        outLine = scale(LineString(outLine), yfact = yfact, xfact = xfact, origin = outLine[0])
+        outLine = list(outLine.coords)
+        newLine = newLine + outLine[1:]
+
+    line2D = LineString(newLine)
+
+    line3D = []
+
+    # adjust the "touchdown" point
+    runinOver = 0
+    runoutOver = 0
+    
+    realrunin = runin - runinOver
+    realrunout = runout - runoutOver
+
+    runoutDist = line2D.length - realrunout
+
+    for d in np.arange(0, line2D.length, 0.1):
         
-    # if distance < 0:
-    #     extend.reverse()
+        if (d <= realrunin):
+            xy = line2D.interpolate(d)
+            z = easeOutCubic(d, zRaised, zHeight - zRaised, realrunin)
+            line3D.append((xy.x, xy.y, z))
+        
+        # add post-processing for x and y (shake etc)
+        # add post-processing for z (shake, slwoly dip etc)
+            
+        if (d > realrunin and d < runoutDist):
+            xy = line2D.interpolate(d)
+            z = zHeight
+            line3D.append((xy.x, xy.y, z))
+            
+        if (d >= runoutDist):
+            xy = line2D.interpolate(d)
+            z = easeInCubic((d - runoutDist), zHeight, zRaised - zHeight, realrunout)
+            line3D.append((xy.x, xy.y, z))
 
-    if mode == "line":
-        extend = scale(LineString(extend), yfact= -1, xfact= -1, origin = line[0])
-    elif mode == "poly":
-        extend = scale(LineString(extend), yfact= -1, origin = line[0])
 
-
-    extend = list(extend.coords)
-    
-    if distance < 0:
-        line.reverse()
-        return line + extend[1:]
-    else:
-        extend.reverse()
-        return extend[:-1] + line
-
-
+    return rdp(line3D, 0.01)
 
 
 def crop_path(line, distance):
@@ -81,8 +118,6 @@ def crop_path(line, distance):
             cropped_coords.append(pair[1])
             cumulative_length += segment_length
 
-    print("cropped")
-    print(cropped_coords)
     return cropped_coords
 
 
@@ -170,3 +205,43 @@ def circle(center: tuple, radius: float, num_points: int) -> list:
     circle_coords.append(circle_coords[0])
     
     return circle_coords
+
+def point_line_distance(point, start, end):
+    point = np.array(point)
+    start = np.array(start)
+    end = np.array(end)
+    if np.all(start == end):
+        return np.linalg.norm(point - start)
+    else:
+        return np.linalg.norm(np.cross(end - start, start - point)) / np.linalg.norm(end - start)
+
+def rdp(points, epsilon):
+    """
+    Simplify a 3D line using the Ramer-Douglas-Peucker algorithm.
+
+    :param points: A numpy array of shape (n, 3) representing the 3D points.
+    :param epsilon: The maximum distance of a point to the line for it to be kept.
+    :return: A numpy array of the simplified points.
+    """
+    if len(points) < 3:
+        return points
+
+    # Find the point with the maximum distance
+    start, end = np.array(points[0]), np.array(points[-1])
+    dmax = 0
+    index = -1
+    for i in range(1, len(points) - 1):
+        d = point_line_distance(points[i], start, end)
+        if d > dmax:
+            index = i
+            dmax = d
+
+    # If max distance is greater than epsilon, recursively simplify
+    if dmax > epsilon:
+        # Recursive call
+        left = rdp(points[:index + 1], epsilon)
+        right = rdp(points[index:], epsilon)
+        # Combine results
+        return np.vstack((left[:-1], right))
+    else:
+        return np.array([start, end])
