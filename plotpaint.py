@@ -8,17 +8,9 @@ import math
 
 class Plotpaint:
 
-    # class easing():
-    #     pass
-
-    # def easing(self):
-    #     # Accessing the nested class from within the main class function
-    #     return self.__class__.easing(self)
-
     def __init__ (self):
         self.strokes = []
         self.ease = Easing()
-        # print(easing)
         self.reset()
         
     def reset(self):
