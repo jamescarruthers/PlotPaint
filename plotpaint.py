@@ -96,7 +96,7 @@ class Plotpaint:
                     line3D.append((xy.x, xy.y, z))
 
 
-        self.strokes.append(self.rdp(line3D, 0.01))
+        self.strokes.append(self.simplify(line3D, 0.01))
 
     def cropPath(self, line, distance):
             
@@ -128,7 +128,7 @@ class Plotpaint:
 
         return cropped_coords
 
-    def rdp(self, points, epsilon):
+    def simplify(self, points, epsilon):
         """
         Simplify a 3D line using the Ramer-Douglas-Peucker algorithm.
 
@@ -152,8 +152,8 @@ class Plotpaint:
         # If max distance is greater than epsilon, recursively simplify
         if dmax > epsilon:
             # Recursive call
-            left = self.rdp(points[:index + 1], epsilon)
-            right = self.rdp(points[index:], epsilon)
+            left = self.simplify(points[:index + 1], epsilon)
+            right = self.simplify(points[index:], epsilon)
             # Combine results
             return np.vstack((left[:-1], right))
         else:
