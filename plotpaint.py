@@ -9,26 +9,41 @@ import math
 class Plotpaint:
 
     def __init__ (self):
+        
+        # strokes stores all the strokes ready to be output as gcode
         self.strokes = []
+        
         self.ease = Easing()
+        
         self.reset()
         
     def reset(self):
-        # Do not reset self.strokes
-        self.feed = 5000
-        self.zUp = 20
-        self.zDown = 5
-        self.runInEase = self.ease.backOut
-        self.runOutEase = self.ease.backIn
+        
+        # runIn distance extends the stroke to allow the brush to have some run up
         self.runIn = 20
-        self.runOut = 20
+        # runInEase sets the curve of the Z as it moves down
+        self.runInEase = self.ease.backOut
+        # runInAdj adjusts where zDown is according to the stoke start point
         self.runInAdj = 0
+        
+        self.runOut = 20
+        self.runOutEase = self.ease.backIn
         self.runOutAdj = 0
+
+        # adjust x and y factor if your run-in or run-out extensions are going the wrong way
         self.xFact = -1
         self.yFact = -1
+        
+        # assign a function to process the run-in, line or run-out
+        # will be more useful once previous coordinates are available
         self.processRunin = None
         self.processLine = None
         self.processRunout = None
+        
+        # machine variables
+        self.zUp = 20 #mm
+        self.zDown = 5 #mm
+        self.feed = 5000
 
     def addStroke(self, line):
         
@@ -97,6 +112,8 @@ class Plotpaint:
 
 
         self.strokes.append(self.simplify(line3D, 0.01))
+        
+        return self.strokes[-1]
 
     def cropPath(self, line, distance):
             
