@@ -1,12 +1,6 @@
 import plotpaint
-import random
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 import math
-from shapely import LineString
 import subprocess 
-import numpy as np
-from easing import *
 
 painting = plotpaint.Plotpaint()
 

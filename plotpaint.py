@@ -219,17 +219,7 @@ class Plotpaint:
 
 
     def circle(self, center: tuple, radius: float, num_points: int) -> list:
-        """
-        Generate a series of coordinates for a circle.
 
-        Parameters:
-        center (tuple): A tuple representing the (x, y) coordinates of the circle's center.
-        radius (float): The radius of the circle.
-        num_points (int): The number of points to generate along the circle's perimeter.
-
-        Returns:
-        list: A list of tuples representing the (x, y) coordinates of the points on the circle.
-        """
         circle_coords = []
         angle_step = 2 * math.pi / num_points
         
