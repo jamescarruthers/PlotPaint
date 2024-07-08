@@ -65,12 +65,15 @@ def process_line(line, zHeight=0, runin=20, runout=20):
     realrunout = runout - runoutOver
 
     runoutDist = line2D.length - realrunout
+    
+    dist = line2D.length - realrunin - realrunout
 
     for d in np.arange(0, line2D.length, 0.1):
         
         if (d <= realrunin):
             xy = line2D.interpolate(d)
-            z = easeOutCubic(d, zRaised, zHeight - zRaised, realrunin)
+            # ease out
+            z = easeOutBack(d, zRaised, zHeight - zRaised, realrunin)
             line3D.append((xy.x, xy.y, z))
         
         # add post-processing for x and y (shake etc)
@@ -79,11 +82,14 @@ def process_line(line, zHeight=0, runin=20, runout=20):
         if (d > realrunin and d < runoutDist):
             xy = line2D.interpolate(d)
             z = zHeight
+            # add speed based on sin function to accerate in the middle
+            #z = sine(d - realrunin, dist/4, zHeight, 1)
             line3D.append((xy.x, xy.y, z))
             
         if (d >= runoutDist):
             xy = line2D.interpolate(d)
-            z = easeInCubic((d - runoutDist), zHeight, zRaised - zHeight, realrunout)
+            # ease in
+            z = easeInBack((d - runoutDist), zHeight, zRaised - zHeight, realrunout)
             line3D.append((xy.x, xy.y, z))
 
 

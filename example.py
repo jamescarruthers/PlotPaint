@@ -6,42 +6,34 @@ import math
 from shapely import LineString
 import subprocess 
 import numpy as np
+from easing import *
 
-setup = plotpaint.Plotpaint()
 painting = plotpaint.Plotpaint()
 
-# for x in range(10, 190, 10):
-#     for y in range(10, 190, 10):
-#         setup.dab(x,y)
-#         painting.dab(x, y, random.randint(0, 360), random.randint(0,10), painting.Ease(0, 2, plotpaint.ease_in_cubic, 0, 2, plotpaint.ease_out_cubic))
+# generate some coordinates
+circle = painting.circle((200,200), 150, 128)
+# add the circle to the painting, using all the default settings
+painting.addStroke(circle)
 
-# setup.output("setup.gcode")
-# painting.output("painting.gcode")
+# change the defaults (see the class init) and add a line
+painting.runInEase = painting.ease.circOut
+painting.runOutEase = painting.ease.circIn
+painting.runIn = 50
+painting.runOut = 50
+painting.addStroke([(100, 300), (300,100)])
 
-# line = [(1,0), (2.5,1), (10,0)]
-line = plotpaint.circle((200,200), 150, 128)
-# line = [(0,0), (0,10)]
-# # line = [(0,0), (10,0), (10,10), (0,10), (0,0)]
-# # line.reverse()
+# reset the defaults
+painting.reset()
 
-# line = []
-# for i in np.arange(0,30, 0.1):
-#     line.append((math.sin(i) * 2, i))
+# a slightly advanced option is to process the line whilst adding the stroke
+def lineProc(d, x, y, z):
+    z += math.sin(d/4) * 0.5
+    return [x,y,z]
+painting.processLine = lineProc
+painting.addStroke([(100,100), (300,300)])
 
-cropped_line = line
-# cropped_line = plotpaint.extend_line(cropped_line, 20)
-cropped_line = plotpaint.process_line(cropped_line, 5, 50, 50)
-# cropped_line = line
-subprocess.run("pbcopy", text=True, input=painting.gcodePoints(cropped_line))
+subprocess.run("pbcopy", text=True, input=painting.output("painting.gcode"))
 
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-x, y, z = zip(*cropped_line)
-ax.plot(x, y, z, color='blue')
-ax.set_title("Path Preview")
-plt.xlabel("X")
-plt.ylabel("Y")
-plt.grid(True)
-ax.set_zlim(bottom=0)
-plt.gca().set_aspect('equal', adjustable='box')
-plt.show()
+painting.viz([painting.strokes[0], painting.strokes[1], painting.strokes[2]])
+
+
