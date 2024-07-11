@@ -4,18 +4,34 @@ import subprocess
 
 painting = plotpaint.Plotpaint()
 
+painting.addStroke(painting.poly((25,25), 10, 0, 36))
+painting.addStroke(painting.poly((painting.pageWidth-25,painting.pageHeight-25), 10, 0, 36))
+
 # generate some coordinates
-circle = painting.circle((200,200), 150, 128)
+circle = painting.poly((150,150), 100, 0, 36)
 # add the circle to the painting, using default settings
 painting.addStroke(circle)
 # the addStroke function returns the stroke in the strokes array
+
+circle = painting.poly((150,150), 75, 180, 128)
+circle.reverse()
+painting.addStroke(circle)
 
 # change the defaults (see the class init) and add a line
 painting.runInEase = painting.ease.circOut
 painting.runOutEase = painting.ease.circIn
 painting.runIn = 50
 painting.runOut = 50
-painting.addStroke([(100, 300), (300,100)])
+
+sine = []
+for x in range(150,200):
+        sine.append([100 + math.sin(x/math.pi) * 20, 100+x])
+painting.addStroke(sine)
+
+sine = []
+for x in range(150,200):
+        sine.append([x + 100, 100+math.sin(x/math.pi) * 20])
+painting.addStroke(sine)
 
 # reset to defaults
 painting.reset()
@@ -28,10 +44,16 @@ def lineProc(d, x, y, z):
 painting.processLine = lineProc
 painting.addStroke([(100,100), (300,300)])
 
-# copy gcode to clipboard
-# subprocess.run("pbcopy", text=True, input=painting.output("painting.gcode"))
+# reset to defaults
+painting.reset()
+
+painting.addStroke([(100,300), (300,100)])
 
 # the viz function allows you to preview one or more strokes in 3D
-painting.viz([painting.strokes[0], painting.strokes[1], painting.strokes[2]])
+painting.viz(painting.strokes, True)
+
+# copy gcode to clipboard
+subprocess.run("pbcopy", text=True, input=painting.output("painting.gcode"))
+
 
 
