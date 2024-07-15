@@ -1,8 +1,18 @@
 import math
-
+import numpy as np
 class Easing:
     # easing functions
     # t = current time, b = beginning value, c = change in value, d = total time
+    @staticmethod
+    def circOutNP(x):
+        x = np.clip(x, 0, 1)
+        return np.sqrt(1 - np.power(x - 1, 2))
+    
+    @staticmethod
+    def circInNP(x):
+        x = np.clip(x, 0, 1)
+        return 1 - np.sqrt(1 - np.power(x, 2))
+
 
     def linear(self, t, b, c, d):
         return c * t / d + b
