@@ -13,7 +13,6 @@ class Easing:
         x = np.clip(x, 0, 1)
         return 1 - np.sqrt(1 - np.power(x, 2))
 
-
     def linear(self, t, b, c, d):
         return c * t / d + b
 
