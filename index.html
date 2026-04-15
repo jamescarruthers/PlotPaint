@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PlotPaint</title>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background: #111;
+        color: #eee;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        overflow: hidden;
+      }
+      #app {
+        position: absolute;
+        inset: 0;
+      }
+      #ui {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        z-index: 10;
+        background: rgba(0, 0, 0, 0.55);
+        padding: 12px 16px;
+        border-radius: 8px;
+        max-width: 360px;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+      #ui h1 { margin: 0 0 6px 0; font-size: 16px; }
+      #ui button {
+        margin-top: 6px;
+        padding: 6px 12px;
+        background: #2a6;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+      }
+      #ui button:hover { background: #3b7; }
+      #log {
+        position: absolute;
+        bottom: 12px;
+        left: 12px;
+        right: 12px;
+        max-height: 180px;
+        overflow: auto;
+        z-index: 10;
+        background: rgba(0, 0, 0, 0.55);
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-family: "Menlo", "Consolas", monospace;
+        font-size: 11px;
+        color: #cfc;
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <div id="ui">
+      <h1>PlotPaint</h1>
+      <div>
+        A JavaScript port of the PlotPaint plotter painting library.
+        Drag to orbit, right-click to pan, scroll to zoom.
+      </div>
+      <button id="download">Download painting.gcode</button>
+    </div>
+    <pre id="log"></pre>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
