@@ -1,2 +1,6 @@
 /___pycache___
+__pycache__
 .DS_Store
+node_modules
+dist
+painting.gcode
