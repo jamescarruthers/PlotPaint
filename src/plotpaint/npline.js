@@ -183,17 +183,17 @@ export const npline = {
   },
 
   // Repeatedly offset a polygon inward until it self-intersects, producing
-  // a spiral-like list of offset rings. Note: returns a list of rings.
+  // a spiral-like list of offset rings. Matches the Python implementation:
+  // each iteration offsets the original polygon by a growing cumulative
+  // distance (not the previously-offset polygon).
   spiral(polygon, offset) {
     const rings = [polygon];
-    let current = polygon;
     let currentOffset = offset;
     // safety guard
     for (let i = 0; i < 10000; i++) {
-      const offsetPoly = npline.offset(current, currentOffset);
+      const offsetPoly = npline.offset(polygon, currentOffset);
       if (npline.isSelfIntersecting(offsetPoly)) break;
       rings.push(offsetPoly);
-      current = offsetPoly;
       currentOffset += offset;
     }
     return rings;

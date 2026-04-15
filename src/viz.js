@@ -34,7 +34,10 @@ export function viz(painting, lines, { page = false, container } = {}) {
 
   const controls = new OrbitControls(camera, renderer.domElement);
 
-  // page outline (y is flipped to match matplotlib orientation in Python viz)
+  // page outline in native paint-space coordinates (origin at bottom-left,
+  // Y increases upward). The matplotlib viz in the Python version flipped Y
+  // for display; here we keep the native orientation and let OrbitControls
+  // handle the camera.
   if (page) {
     const pageLines = [
       [0, 0, 0],
@@ -116,14 +119,35 @@ export function viz(painting, lines, { page = false, container } = {}) {
   };
   window.addEventListener('resize', onResize);
 
+  let rafId = 0;
+  let stopped = false;
   const animate = () => {
-    requestAnimationFrame(animate);
+    if (stopped) return;
+    rafId = requestAnimationFrame(animate);
     controls.update();
     renderer.render(scene, camera);
   };
   animate();
 
-  return { scene, camera, renderer, controls };
+  const dispose = () => {
+    stopped = true;
+    cancelAnimationFrame(rafId);
+    window.removeEventListener('resize', onResize);
+    controls.dispose();
+    scene.traverse((obj) => {
+      if (obj.geometry) obj.geometry.dispose();
+      if (obj.material) {
+        const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+        for (const m of mats) m.dispose?.();
+      }
+    });
+    renderer.dispose();
+    if (renderer.domElement.parentNode === host) {
+      host.removeChild(renderer.domElement);
+    }
+  };
+
+  return { scene, camera, renderer, controls, dispose };
 }
 
 export default viz;

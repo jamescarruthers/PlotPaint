@@ -6,13 +6,20 @@ import { viz } from './viz.js';
 // tee console.log to the in-page log pane
 const logEl = document.getElementById('log');
 const origLog = console.log.bind(console);
+const formatLogArg = (a) => {
+  if (a !== null && typeof a === 'object') {
+    try {
+      return JSON.stringify(a);
+    } catch {
+      return String(a);
+    }
+  }
+  return String(a);
+};
 console.log = (...args) => {
   origLog(...args);
   if (logEl) {
-    logEl.textContent +=
-      args
-        .map((a) => (typeof a === 'object' ? JSON.stringify(a) : String(a)))
-        .join(' ') + '\n';
+    logEl.textContent += args.map(formatLogArg).join(' ') + '\n';
     logEl.scrollTop = logEl.scrollHeight;
   }
 };

@@ -4,6 +4,9 @@
   "description": "A library for painting with a plotter",
   "type": "module",
   "main": "src/plotpaint/index.js",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",

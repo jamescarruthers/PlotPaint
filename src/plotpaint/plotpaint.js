@@ -14,20 +14,6 @@ function linspace(start, stop, n) {
   return out;
 }
 
-// np.isin with all-columns-match, emulating the (xy, ez) match in Python.
-function matchesRow(row, set, eps = 1e-9) {
-  for (let i = 0; i < set.length; i++) {
-    const r = set[i];
-    if (
-      Math.abs(r[0] - row[0]) <= eps &&
-      Math.abs(r[1] - row[1]) <= eps &&
-      Math.abs(r[2] - row[2]) <= eps
-    )
-      return true;
-  }
-  return false;
-}
-
 export class Plotpaint {
   constructor() {
     this.strokes = [];
@@ -121,7 +107,7 @@ export class Plotpaint {
 
     // the main line. In the Python source, this re-uses the raw input when
     // no processLine/pathOffset is set (faster for long paths).
-    let lineXY = this.processLine || this.pathOffset ? xy : line;
+    let lineXY = (this.processLine || this.pathOffset) ? xy : line;
     const mid = new Array(lineXY.length);
     for (let i = 0; i < lineXY.length; i++) {
       mid[i] = [lineXY[i][0], lineXY[i][1], this.zDown];
