@@ -14,6 +14,9 @@
     "export": "node scripts/export-gcode.js"
   },
   "dependencies": {
+    "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/theme-one-dark": "^6.1.2",
+    "codemirror": "^6.0.1",
     "three": "^0.164.1"
   },
   "devDependencies": {
