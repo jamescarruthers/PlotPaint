@@ -3,6 +3,11 @@
 A library for painting with a plotter — originally a Python package,
 now ported to JavaScript using Vite and Three.js.
 
+The browser demo ships with a **CodeMirror editor on the left and a
+live 3D preview on the right**. Edit the script and press
+<kbd>Ctrl/⌘+Enter</kbd> (or the Run button) to re-render. Your code is
+auto-saved to local storage.
+
 See `src/main.js` (browser demo) or `scripts/export-gcode.js` (Node
 headless export) for usage examples.
 
@@ -26,7 +31,8 @@ npm run export    # run the example in Node and write painting.gcode
   - `easing.js` — easing curves (drop-in replacement for `easywaves.npCurves`)
   - `simplify.js` — 3D Ramer-Douglas-Peucker (drop-in replacement for `simplify5d`)
 - `src/viz.js` — Three.js 3D visualisation (replaces the matplotlib viz)
-- `src/main.js` — browser demo entry point
+- `src/editor.js` — CodeMirror editor setup
+- `src/main.js` — browser demo entry point (editor + preview + splitter)
 - `scripts/export-gcode.js` — Node-only gcode export
 
 ## Notes on the port

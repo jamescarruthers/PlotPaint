@@ -5,72 +5,150 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PlotPaint</title>
     <style>
+      :root {
+        --bg: #111;
+        --panel: #181818;
+        --panel-hi: #202020;
+        --border: #2a2a2a;
+        --text: #e8e8e8;
+        --muted: #9a9a9a;
+        --accent: #2a6;
+        --accent-hi: #3b7;
+        --error: #ff5a5a;
+      }
+
       html, body {
         margin: 0;
         padding: 0;
         height: 100%;
-        background: #111;
-        color: #eee;
+        background: var(--bg);
+        color: var(--text);
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         overflow: hidden;
       }
+
       #app {
         position: absolute;
         inset: 0;
+        display: grid;
+        grid-template-columns: var(--split, 45%) 6px 1fr;
+        grid-template-rows: 100%;
       }
-      #ui {
-        position: absolute;
-        top: 12px;
-        left: 12px;
-        z-index: 10;
-        background: rgba(0, 0, 0, 0.55);
-        padding: 12px 16px;
-        border-radius: 8px;
-        max-width: 360px;
+
+      /* ---- editor pane ---- */
+      #editor-pane {
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        min-width: 260px;
+        border-right: 1px solid var(--border);
+        background: var(--panel);
+      }
+
+      #toolbar {
+        display: flex;
+        gap: 8px;
+        padding: 8px 10px;
+        background: var(--panel-hi);
+        border-bottom: 1px solid var(--border);
+        align-items: center;
+      }
+      #toolbar h1 {
+        margin: 0;
         font-size: 13px;
-        line-height: 1.5;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        flex: 1;
       }
-      #ui h1 { margin: 0 0 6px 0; font-size: 16px; }
-      #ui button {
-        margin-top: 6px;
-        padding: 6px 12px;
-        background: #2a6;
+      #toolbar button {
+        padding: 5px 10px;
+        background: var(--accent);
         color: white;
         border: none;
         border-radius: 4px;
         cursor: pointer;
-        font-size: 13px;
+        font-size: 12px;
       }
-      #ui button:hover { background: #3b7; }
+      #toolbar button:hover { background: var(--accent-hi); }
+      #toolbar button.secondary {
+        background: #333;
+      }
+      #toolbar button.secondary:hover { background: #444; }
+      #toolbar kbd {
+        background: #2b2b2b;
+        border-radius: 3px;
+        padding: 1px 5px;
+        font-size: 11px;
+        color: var(--muted);
+        font-family: "Menlo", "Consolas", monospace;
+      }
+
+      #editor {
+        overflow: hidden;
+        min-height: 0;
+      }
+      #editor .cm-editor { height: 100%; }
+      #editor .cm-scroller { font-family: "Menlo", "Consolas", monospace; }
+
       #log {
-        position: absolute;
-        bottom: 12px;
-        left: 12px;
-        right: 12px;
-        max-height: 180px;
-        overflow: auto;
-        z-index: 10;
-        background: rgba(0, 0, 0, 0.55);
+        margin: 0;
         padding: 8px 12px;
-        border-radius: 8px;
+        max-height: 28vh;
+        overflow: auto;
+        background: #0c0c0c;
+        border-top: 1px solid var(--border);
         font-family: "Menlo", "Consolas", monospace;
         font-size: 11px;
         color: #cfc;
         white-space: pre-wrap;
       }
+      #log .err { color: var(--error); }
+
+      /* ---- splitter ---- */
+      #splitter {
+        cursor: col-resize;
+        background: var(--border);
+      }
+      #splitter:hover { background: #3a3a3a; }
+
+      /* ---- preview pane ---- */
+      #preview-pane {
+        position: relative;
+        background: var(--bg);
+        min-width: 200px;
+      }
+      #viz {
+        position: absolute;
+        inset: 0;
+      }
+
+      /* small screens: stack */
+      @media (max-width: 720px) {
+        #app {
+          grid-template-columns: 100%;
+          grid-template-rows: 50% 6px 1fr;
+        }
+        #splitter { cursor: row-resize; }
+        #editor-pane { border-right: none; border-bottom: 1px solid var(--border); }
+      }
     </style>
   </head>
   <body>
-    <div id="app"></div>
-    <div id="ui">
-      <h1>PlotPaint</h1>
-      <div>
-        A JavaScript port of the PlotPaint plotter painting library.
-        Drag to orbit, right-click to pan, scroll to zoom.
+    <div id="app">
+      <div id="editor-pane">
+        <div id="toolbar">
+          <h1>PlotPaint</h1>
+          <kbd>Ctrl/⌘+Enter</kbd>
+          <button id="run">Run ▶</button>
+          <button id="download" class="secondary">⬇ gcode</button>
+        </div>
+        <div id="editor"></div>
+        <pre id="log"></pre>
       </div>
-      <button id="download">Download painting.gcode</button>
+      <div id="splitter" title="Drag to resize"></div>
+      <div id="preview-pane">
+        <div id="viz"></div>
+      </div>
     </div>
-    <pre id="log"></pre>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
